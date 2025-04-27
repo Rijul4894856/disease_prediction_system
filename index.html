@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetes Prediction System</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Diabetes Prediction System</h1>
+        <p>Model Accuracy: {{ accuracy }}</p>
+        <form id="prediction-form">
+            {% for feature in features %}
+            <div class="form-group">
+                <label for="{{ feature }}">{{ feature }}</label>
+                <input type="number" step="any" id="{{ feature }}" name="{{ feature }}" required>
+            </div>
+            {% endfor %}
+            <button type="submit">Predict</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script>
+        document.getElementById("prediction-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch("/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    document.getElementById("result").innerHTML = 
+                        `<h3>Result: ${data.result}</h3><p>Probability: ${(data.probability * 100).toFixed(2)}%</p>`;
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+</html>
